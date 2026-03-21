@@ -8,8 +8,8 @@
 </head>
 <body>
 
-  <main>
-    <h1>Choose Your Plan</h1>
+  <div class="red-calc">
+    <h2>Red calculator:</h2>
 
     <!-- Red Tariff (required) -->
     <div class="form-row">
@@ -27,54 +27,54 @@
         <option value="Red Exclusive">Red Exclusive</option>
       </select>
     </div>
+
     <div class="flex-row">
-        <!-- DSL (optional; toggle button above the dropdown) -->
-        <div class="form-row">
-          <div class="toggle-group">
-            <input type="checkbox" id="toggle-dsl" class="toggle">
-            <label for="toggle-dsl" class="toggle-btn">Include DSL</label>
-          </div>
-    
-          <div id="dsl-wrap" style="display: none;">
-            <label for="dsl-bundle">DSL Bundle</label>
-            <select id="dsl-bundle" name="dsl-bundle" disabled>
-              <option hidden value="">-- Select DSL Bundle --</option>
-              <option value="30 * 140">30 * 140</option>
-              <option value="30 * 200">30 * 200</option>
-              <option value="30 * 300">30 * 300</option>
-              <option value="30 * 600">30 * 600</option>
-              <option value="70 * 300">70 * 300</option>
-              <option value="100 * 300">100 * 300</option>
-              <option value="100 * 600">100 * 600</option>
-              <option value="200 * 1T">200 * 1T</option>
-            </select>
-          </div>
+      <!-- DSL (optional; toggle button above the dropdown) -->
+      <div class="form-row">
+        <div class="toggle-group">
+          <input type="checkbox" id="toggle-dsl" class="toggle">
+          <label for="toggle-dsl" class="toggle-btn">Include DSL</label>
         </div>
-    
-        <!-- At home (optional; toggle button above the dropdown) -->
-        <div class="form-row">
-          <div class="toggle-group">
-            <input type="checkbox" id="toggle-athome" class="toggle">
-            <label for="toggle-athome" class="toggle-btn">Include At home</label>
-          </div>
-    
-          <div id="athome-wrap" style="display: none;">
-            <label for="athome-bundle">At home Bundle</label>
-            <select id="athome-bundle" name="athome-bundle" disabled>
-              <option hidden value="">-- Select At home Bundle --</option>
-              <option value="40 GB">40 GB</option>
-              <option value="135 GB">135 GB</option>
-              <option value="250 GB">250 GB</option>
-              <option value="400 GB">400 GB</option>
-            </select>
-          </div>
+
+        <div id="dsl-wrap" style="display: none;">
+          <label for="dsl-bundle">DSL Bundle</label>
+          <select id="dsl-bundle" name="dsl-bundle" disabled>
+            <option hidden value="">-- Select DSL Bundle --</option>
+            <option value="30 * 140">30 * 140</option>
+            <option value="30 * 200">30 * 200</option>
+            <option value="30 * 300">30 * 300</option>
+            <option value="30 * 600">30 * 600</option>
+            <option value="70 * 300">70 * 300</option>
+            <option value="100 * 300">100 * 300</option>
+            <option value="100 * 600">100 * 600</option>
+            <option value="200 * 1T">200 * 1T</option>
+          </select>
         </div>
+      </div>
+
+      <!-- At home (optional; toggle button above the dropdown) -->
+      <div class="form-row">
+        <div class="toggle-group">
+          <input type="checkbox" id="toggle-athome" class="toggle">
+          <label for="toggle-athome" class="toggle-btn">Include At home</label>
+        </div>
+
+        <div id="athome-wrap" style="display: none;">
+          <label for="athome-bundle">At home Bundle</label>
+          <select id="athome-bundle" name="athome-bundle" disabled>
+            <option hidden value="">-- Select At home Bundle --</option>
+            <option value="40 GB">40 GB</option>
+            <option value="135 GB">135 GB</option>
+            <option value="250 GB">250 GB</option>
+            <option value="400 GB">400 GB</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <!-- Results -->
     <div id="result" class="mt-12"></div>
-    <div id="audit"></div>
-  </main>
+  </div>
 
   <script src="app.js"></script>
 </body>

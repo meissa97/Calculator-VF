@@ -4,8 +4,8 @@
   --card: #ffffff;
   --text: #222;
   --muted: #5a5f6a;
-  --primary: #0a7cff;
-  --primary-700: #095fcc;
+  --primary: #e00101d7;
+  --primary-700: #e00101c6;
   --accent: #00b894;
   --border: #e5e7eb;
   --shadow: 0 6px 22px rgba(0,0,0,.06);
@@ -33,7 +33,10 @@ body {
 }
 
 /* ------------ Layout Card ------------ */
-main {
+h2{
+  color: var(--primary);
+}
+.red-calc {
   width: min(720px, 100%);
   background: var(--card);
   border: 1px solid var(--border);
@@ -43,7 +46,7 @@ main {
 }
 
 @media (min-width: 640px) {
-  main { padding: 26px 24px; }
+  .red-calc { padding: 26px 24px; }
 }
 
 h1 {
@@ -65,6 +68,10 @@ h1 {
   flex-direction: column;
   gap: 6px;
   margin-bottom: 14px;
+  width: calc(100% - 60px);
+}
+.rp-h{
+  height: 145px;
 }
 .flex-row{
     display: flex;
@@ -103,7 +110,7 @@ select {
 
 select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(10,124,255,.12);
+  box-shadow: 0 0 0 4px rgba(255, 10, 10, 0.12);
 }
 
 /* ------------ Results / Audit ------------ */
@@ -255,8 +262,8 @@ select:focus {
 
 /* Checked state — changes color when clicked */
 .toggle-group .toggle:checked + .toggle-btn {
-  background: #0a7cff;      /* primary */
-  border-color: #0a7cff;
+  background: var(--primary);      /* primary */
+  border-color: var(--primary);
   color: #fff;
 }
 
@@ -264,4 +271,12 @@ select:focus {
 select:disabled {
   background-color: #f3f4f6;
   color: #7a7f88;
+}
+.final-total{
+  margin: 10px auto;
+  width: fit-content;
+  font-size: 24px;
+}
+.final-number{
+  color: #0d6e63;
 }

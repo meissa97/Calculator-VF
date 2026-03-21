@@ -45,36 +45,59 @@ const DSL_DISCOUNT_BY_RED = {
 // --- Helpers ---
 const formatEGP = (n) => `${n.toFixed(2)} EGP`;
 
+// Determine if Red tier is Essential/Advance family
+const isEssentialAdvanceTier = (redName) =>
+  redName === "Red Essential" || redName === "Essential+" ||
+  redName === "Red Advance"   || redName === "Advance+";
+
+// At home discount rules:
+// - If DSL OFF  -> 250 (Essential/Advance tiers) else 450 (others)
+// - If DSL ON   -> 450 ONLY for "Red Exclusive", otherwise 0
+function getAtHomeDiscount(redName, includeDSL) {
+  if (!includeDSL) {
+    return isEssentialAdvanceTier(redName) ? 250 : 450;
+  }
+  // DSL is ON
+  return redName === "Red Exclusive" ? 450 : 0;
+}
+
 // Core calculation (Red + optional DSL + optional At home)
-// Red: A * 1.08 * 1.14
-// DSL: max(B - discount, 0) * 1.14           (discount BEFORE VAT)
-// At home: base * 1.08 * 1.14                (same taxes as Red)
-// Final = Red + DSL + At home
+// Red:  base × 1.08 × 1.14
+// DSL:  preVAT = max(base - dslDiscount, 0); postVAT = preVAT × 1.14
+// Home: preTaxes = max(base - atHomeDiscount, 0); postTaxes = preTaxes × 1.08 × 1.14
+// Total = Red_postTaxes + DSL_postVAT + Home_postTaxes
 function calcTotals({ redName, includeDSL, dslName, includeAtHome, athomeName }) {
-  const A = RED_TARIFF_PRICES[redName];
-  const redWithTaxes = (A * 1.08) * 1.14;
+  const redBase = RED_TARIFF_PRICES[redName];
+  const redPostTaxes = (redBase * 1.08) * 1.14;
 
   // DSL
-  let E = 0;
-  let discount = 0;
-  let discountedB = 0;
+  let dslPreVAT = 0;
+  let dslPostVAT = 0;
   if (includeDSL) {
-    const B = DSL_TARIFFS[dslName];
-    discount = DSL_DISCOUNT_BY_RED[redName] || 0;
-    discountedB = Math.max(B - discount, 0);
-    E = discountedB * 1.14;
+    const dslBase = DSL_TARIFFS[dslName];
+    const dslDiscount = DSL_DISCOUNT_BY_RED[redName] || 0;
+    dslPreVAT = Math.max(dslBase - dslDiscount, 0);
+    dslPostVAT = dslPreVAT * 1.14;
   }
 
   // At home
-  let H = 0;
+  let homePreTaxes = 0;
+  let homePostTaxes = 0;
   if (includeAtHome) {
-    const base = AT_HOME_TARIFFS[athomeName];
-    H = (base * 1.08) * 1.14;
+    const homeBase = AT_HOME_TARIFFS[athomeName];
+    const atHomeDiscount = getAtHomeDiscount(redName, includeDSL);
+    homePreTaxes = Math.max(homeBase - atHomeDiscount, 0);
+    homePostTaxes = (homePreTaxes * 1.08) * 1.14;
   }
 
-  const Final = redWithTaxes + E + H;
+  const total = redPostTaxes + dslPostVAT + homePostTaxes;
 
-  return { E, H, Final, discount, discountedB };
+  return {
+    redPostTaxes,
+    dslPreVAT, dslPostVAT,
+    homePreTaxes, homePostTaxes,
+    total
+  };
 }
 
 // --- UI elements ---
@@ -89,7 +112,6 @@ const atHomeWrap = document.getElementById('athome-wrap');
 const atHomeSel = document.getElementById('athome-bundle');
 
 const resultBox = document.getElementById('result');
-const auditBox = document.getElementById('audit');
 
 // --- Render logic: auto-calc with validation based on toggles ---
 function render() {
@@ -97,53 +119,63 @@ function render() {
   const includeDSL = dslToggle.checked;
   const includeAtHome = atHomeToggle.checked;
 
-  // Always keep selects enabled/disabled in sync with toggles
+  // Keep selects enabled/disabled in sync with toggles
   dslSel.disabled = !includeDSL;
   atHomeSel.disabled = !includeAtHome;
 
   // If Red not selected yet, clear outputs
   if (!redName) {
     resultBox.textContent = '';
-    auditBox.textContent = '';
     return;
   }
 
   // If a toggle is ON but no bundle chosen yet, ask for it
   if (includeDSL && !dslSel.value) {
     resultBox.textContent = 'Please select a DSL bundle.';
-    auditBox.textContent = '';
     return;
   }
   if (includeAtHome && !atHomeSel.value) {
     resultBox.textContent = 'Please select an At home bundle.';
-    auditBox.textContent = '';
     return;
   }
 
-  const { E, H, Final, discount, discountedB } = calcTotals({
+  const {
+    dslPreVAT, dslPostVAT,
+    homePreTaxes, homePostTaxes,
+    total
+  } = calcTotals({
     redName,
-    includeDSL,
-    dslName: dslSel.value,
-    includeAtHome,
-    athomeName: atHomeSel.value
+    includeDSL, dslName: dslSel.value,
+    includeAtHome, athomeName: atHomeSel.value
   });
 
-  // Build output
+  // Build output:
+  // - DSL line shown only if DSL is ON
+  // - At home line shown only if At home is ON
+  // - Total always shown (when inputs valid)
   let html = '';
-  if (includeDSL) {
-    html += `<div>DSL after discount and VAT: <strong>${formatEGP(E)}</strong></div>`;
-  }
-  html += `<div>Total of the bill: <strong>${formatEGP(Final)}</strong></div>`;
-  resultBox.innerHTML = html;
 
-  // Audit (only if DSL is included)
   if (includeDSL) {
-    auditBox.textContent =
-      `Audit: Discount applied = ${formatEGP(discount)} | ` +
-      `DSL after discount (pre‑VAT) = ${formatEGP(discountedB)}`;
-  } else {
-    auditBox.textContent = '';
+    html += `
+      <div>
+        DSL (after discount) — pre‑VAT: <strong>${formatEGP(dslPreVAT)}</strong>,
+        after VAT: <strong>${formatEGP(dslPostVAT)}</strong>
+      </div>
+    `;
   }
+
+  if (includeAtHome) {
+    html += `
+      <div>
+        At home (after discount) — pre‑taxes: <strong>${formatEGP(homePreTaxes)}</strong>,
+        after taxes: <strong>${formatEGP(homePostTaxes)}</strong>
+      </div>
+    `;
+  }
+
+  html += `<div class="final-total">Total of the bill: <strong class="final-number">${formatEGP(total)}</strong></div>`;
+
+  resultBox.innerHTML = html;
 }
 
 // --- Toggle behaviors: show/hide and enable/disable selects ---
