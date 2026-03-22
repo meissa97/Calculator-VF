@@ -202,3 +202,127 @@ atHomeSel.addEventListener('change', render);
 
 // Initial render
 render();
+
+// ───────── Taxes Converter logic ─────────
+const taxesInput = document.getElementById('taxes-input');
+const taxesLine1 = document.getElementById('taxes-line1');
+const taxesLine2 = document.getElementById('taxes-line2');
+const taxesLine3 = document.getElementById('taxes-line3');
+
+function formatEGPLoose(n) {
+  // Reuse formatting but be resilient when empty/NaN
+  return isFinite(n) ? `${Number(n).toFixed(2)} EGP` : '—';
+}
+
+function computeTaxesOutputs(a4) {
+  // Guard
+  const val = Number(a4);
+  if (!isFinite(val)) return { out1: NaN, out2: NaN, out3: NaN };
+
+  // Per your formulas:
+  // 1) A4 / 1.14
+  const out1 = val / 1.14;
+
+  // 2) A4 * 42.8% + A4  →  A4 * 1.428
+  const out2 = val * 1.428;
+
+  // 3) A4 * 0.7001
+  const out3 = val * 0.7001;
+
+  return { out1, out2, out3 };
+}
+
+function renderTaxes() {
+  const a4 = taxesInput?.value?.trim();
+  if (!a4) {
+    taxesLine1.textContent = '';
+    taxesLine2.textContent = '';
+    taxesLine3.textContent = '';
+    return;
+  }
+
+  const { out1, out2, out3 } = computeTaxesOutputs(a4);
+
+  taxesLine1.innerHTML = `DSL OCC: <strong>${formatEGPLoose(out1)}</strong>`;
+  taxesLine2.innerHTML = `Credit + Taxes: <strong>${formatEGPLoose(out2)}</strong>`;
+  taxesLine3.innerHTML = `Credit only: <strong>${formatEGPLoose(out3)}</strong>`;
+}
+
+// Live update on input
+taxesInput?.addEventListener('input', renderTaxes);
+
+// Optional: initialize once on load
+renderTaxes();
+
+// ───────── Bytes Converter (decimal: 1 GB = 1000 MB; 1 MB = 1000 KB) ─────────
+const gbEl = document.getElementById('bytes-gb');
+const mbEl = document.getElementById('bytes-mb');
+const kbEl = document.getElementById('bytes-kb');
+
+if (gbEl && mbEl && kbEl) {
+  const DEC = { GB_TO_MB: 1024, MB_TO_KB: 1024 };
+  let lock = false; // prevent feedback loops
+
+  const trimZeros = (s) => String(s).replace(/\.?0+$/,'');
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  };
+
+  function setFromGB(gb) {
+    const v = toNum(gb);
+    if (!Number.isFinite(v)) return;
+    const mb = v * DEC.GB_TO_MB;
+    const kb = mb * DEC.MB_TO_KB;
+    mbEl.value = trimZeros(mb.toFixed(3));
+    kbEl.value = String(Math.round(kb));
+  }
+
+  function setFromMB(mb) {
+    const v = toNum(mb);
+    if (!Number.isFinite(v)) return;
+    const gb = v / DEC.GB_TO_MB;
+    const kb = v * DEC.MB_TO_KB;
+    gbEl.value = trimZeros(gb.toFixed(6));
+    kbEl.value = String(Math.round(kb));
+  }
+
+  function setFromKB(kb) {
+    const v = toNum(kb);
+    if (!Number.isFinite(v)) return;
+    const mb = v / DEC.MB_TO_KB;
+    const gb = mb / DEC.GB_TO_MB;
+    mbEl.value = trimZeros(mb.toFixed(3));
+    gbEl.value = trimZeros(gb.toFixed(6));
+  }
+
+  function onGB() { if (lock) return; lock = true; setFromGB(gbEl.value); lock = false; }
+  function onMB() { if (lock) return; lock = true; setFromMB(mbEl.value); lock = false; }
+  function onKB() { if (lock) return; lock = true; setFromKB(kbEl.value); lock = false; }
+
+  gbEl.addEventListener('input', onGB);
+  mbEl.addEventListener('input', onMB);
+  kbEl.addEventListener('input', onKB);
+
+  // Copy buttons (event delegation from the container div)
+  document.querySelector('.conv-byte')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    const targetId = btn.getAttribute('data-copy-target');
+    const input = document.getElementById(targetId);
+    if (!input) return;
+
+    const text = input.value ?? '';
+    try {
+      await navigator.clipboard.writeText(String(text));
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 900);
+    } catch {
+      // Fallback for older browsers
+      input.select();
+      document.execCommand('copy');
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 900);
+    }
+  });
+}

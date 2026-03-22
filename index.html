@@ -3,10 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tariff & Add-ons</title>
+  <title>Helper</title>
+  <link rel="icon" href="money.png"/>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <div class="tax-conv">
+    <div class="tax-chrg" id="taxes-converter">
+    <h2>Money and charges</h2>
+      
+    <div class="form-row">
+      <label for="taxes-input">Enter amount</label>
+      <input type="number" id="taxes-input" placeholder="0.00" step="1" min="0" />
+    </div>
+
+    <div id="taxes-result">
+      <div id="taxes-line1"></div>
+      <div id="taxes-line2" class="mt-8"></div>
+      <div id="taxes-line3" class="mt-8"></div>
+    </div>
+
+    </div>
+<div class="conv-byte">
+  <h2>Bytes Converter</h2>
+
+  <!-- GB -->
+  <div class="form-row input-with-copy">
+    <label for="bytes-gb">GB</label>
+    <div class="input-copy-wrap">
+      <input type="number" id="bytes-gb" step="0.001" min="0" placeholder="0.000" />
+      <button class="copy-btn" type="button" data-copy-target="bytes-gb" aria-label="Copy GB">
+        <!-- copy icon -->
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="currentColor"
+            d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- MB -->
+  <div class="form-row input-with-copy">
+    <label for="bytes-mb">MB</label>
+    <div class="input-copy-wrap">
+      <input type="number" id="bytes-mb" step="0.1" min="0" placeholder="0.0" />
+      <button class="copy-btn" type="button" data-copy-target="bytes-mb" aria-label="Copy MB">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="currentColor"
+            d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- KB -->
+  <div class="form-row input-with-copy">
+    <label for="bytes-kb">KB</label>
+    <div class="input-copy-wrap">
+      <input type="number" id="bytes-kb" step="1" min="0" placeholder="0" />
+      <button class="copy-btn" type="button" data-copy-target="bytes-kb" aria-label="Copy KB">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="currentColor"
+            d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- helper text -->
+  <div style="color:var(--muted); font-size:.9rem; margin-top:4px;">
+  </div>
+</div>
+  </div>
 
   <div class="red-calc">
     <h2>Red calculator:</h2>
