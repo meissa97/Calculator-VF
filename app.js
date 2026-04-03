@@ -258,9 +258,10 @@ renderTaxes();
 const gbEl = document.getElementById('bytes-gb');
 const mbEl = document.getElementById('bytes-mb');
 const kbEl = document.getElementById('bytes-kb');
+const bEl = document.getElementById('bytes-b');
 
-if (gbEl && mbEl && kbEl) {
-  const DEC = { GB_TO_MB: 1024, MB_TO_KB: 1024 };
+if (gbEl && mbEl && kbEl && bEl) {
+  const DEC = { GB_TO_MB: 1024, MB_TO_KB: 1024, KB_TO_B: 1024};
   let lock = false; // prevent feedback loops
 
   const trimZeros = (s) => String(s).replace(/\.?0+$/,'');
@@ -270,39 +271,66 @@ if (gbEl && mbEl && kbEl) {
   };
 
   function setFromGB(gb) {
-    const v = toNum(gb);
-    if (!Number.isFinite(v)) return;
-    const mb = v * DEC.GB_TO_MB;
-    const kb = mb * DEC.MB_TO_KB;
-    mbEl.value = trimZeros(mb.toFixed(3));
-    kbEl.value = String(Math.round(kb));
-  }
+  const v = toNum(gb);
+  if (!Number.isFinite(v)) return;
 
-  function setFromMB(mb) {
-    const v = toNum(mb);
-    if (!Number.isFinite(v)) return;
-    const gb = v / DEC.GB_TO_MB;
-    const kb = v * DEC.MB_TO_KB;
-    gbEl.value = trimZeros(gb.toFixed(6));
-    kbEl.value = String(Math.round(kb));
-  }
+  const mb = v * DEC.GB_TO_MB;
+  const kb = mb * DEC.MB_TO_KB;
+  const b  = kb * DEC.KB_TO_B;
 
-  function setFromKB(kb) {
-    const v = toNum(kb);
-    if (!Number.isFinite(v)) return;
-    const mb = v / DEC.MB_TO_KB;
-    const gb = mb / DEC.GB_TO_MB;
-    mbEl.value = trimZeros(mb.toFixed(3));
-    gbEl.value = trimZeros(gb.toFixed(6));
-  }
+  mbEl.value = trimZeros(mb.toFixed(3));
+  kbEl.value = String(Math.round(kb));
+  bEl.value  = String(Math.round(b));
+}
 
-  function onGB() { if (lock) return; lock = true; setFromGB(gbEl.value); lock = false; }
-  function onMB() { if (lock) return; lock = true; setFromMB(mbEl.value); lock = false; }
-  function onKB() { if (lock) return; lock = true; setFromKB(kbEl.value); lock = false; }
+function setFromMB(mb) {
+  const v = toNum(mb);
+  if (!Number.isFinite(v)) return;
 
-  gbEl.addEventListener('input', onGB);
-  mbEl.addEventListener('input', onMB);
-  kbEl.addEventListener('input', onKB);
+  const gb = v / DEC.GB_TO_MB;
+  const kb = v * DEC.MB_TO_KB;
+  const b  = kb * DEC.KB_TO_B;
+
+  gbEl.value = trimZeros(gb.toFixed(6));
+  kbEl.value = String(Math.round(kb));
+  bEl.value  = String(Math.round(b));
+}
+
+function setFromKB(kb) {
+  const v = toNum(kb);
+  if (!Number.isFinite(v)) return;
+
+  const mb = v / DEC.MB_TO_KB;
+  const gb = mb / DEC.GB_TO_MB;
+  const b  = v * DEC.KB_TO_B;
+
+  mbEl.value = trimZeros(mb.toFixed(3));
+  gbEl.value = trimZeros(gb.toFixed(6));
+  bEl.value  = String(Math.round(b));
+}
+
+function setFromB(b) {
+  const v = toNum(b);
+  if (!Number.isFinite(v)) return;
+
+  const kb = v / DEC.KB_TO_B;
+  const mb = kb / DEC.MB_TO_KB;
+  const gb = mb / DEC.GB_TO_MB;
+
+  kbEl.value = String(Math.round(kb));
+  mbEl.value = trimZeros(mb.toFixed(3));
+  gbEl.value = trimZeros(gb.toFixed(6));
+}
+
+function onGB() { if (lock) return; lock = true; setFromGB(gbEl.value); lock = false; }
+function onMB() { if (lock) return; lock = true; setFromMB(mbEl.value); lock = false; }
+function onKB() { if (lock) return; lock = true; setFromKB(kbEl.value); lock = false; }
+function onB()  { if (lock) return; lock = true; setFromB(bEl.value);  lock = false; }
+
+gbEl.addEventListener('input', onGB);
+mbEl.addEventListener('input', onMB);
+kbEl.addEventListener('input', onKB);
+bEl.addEventListener('input', onB);
 
   // Copy buttons (event delegation from the container div)
   document.querySelector('.conv-byte')?.addEventListener('click', async (e) => {
