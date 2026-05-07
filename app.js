@@ -1,5 +1,6 @@
 // --- Data ---
 const RED_TARIFF_PRICES = {
+  "Non-Red": 0,
   "Red Essential": 530,
   "Essential+": 585,
   "Red Advance": 870,
@@ -54,6 +55,9 @@ const isEssentialAdvanceTier = (redName) =>
 // - If DSL OFF  -> 250 (Essential/Advance tiers) else 450 (others)
 // - If DSL ON   -> 450 ONLY for "Red Exclusive", otherwise 0
 function getAtHomeDiscount(redName, includeDSL) {
+    if (redName === "Non-Red") {
+    return 0;
+  }
   if (!includeDSL) {
     return isEssentialAdvanceTier(redName) ? 290 : 520;
   }
@@ -208,6 +212,7 @@ const taxesInput = document.getElementById('taxes-input');
 const taxesLine1 = document.getElementById('taxes-line1');
 const taxesLine2 = document.getElementById('taxes-line2');
 const taxesLine3 = document.getElementById('taxes-line3');
+const taxesLine4 = document.getElementById('taxes-line4');
 
 function formatEGPLoose(n) {
   // Reuse formatting but be resilient when empty/NaN
@@ -229,7 +234,10 @@ function computeTaxesOutputs(a4) {
   // 3) A4 * 0.7001
   const out3 = val * 0.7001;
 
-  return { out1, out2, out3 };
+  // 4) A4 * 1.14
+  const out4 = val * 1.14
+
+  return { out1, out2, out3, out4 };
 }
 
 function renderTaxes() {
@@ -238,14 +246,16 @@ function renderTaxes() {
     taxesLine1.textContent = '';
     taxesLine2.textContent = '';
     taxesLine3.textContent = '';
+    taxesLine4.textContent = '';
     return;
   }
 
-  const { out1, out2, out3 } = computeTaxesOutputs(a4);
+  const { out1, out2, out3, out4 } = computeTaxesOutputs(a4);
 
   taxesLine1.innerHTML = `DSL OCC: <strong>${formatEGPLoose(out1)}</strong>`;
   taxesLine2.innerHTML = `Credit + Taxes: <strong>${formatEGPLoose(out2)}</strong>`;
   taxesLine3.innerHTML = `Credit only: <strong>${formatEGPLoose(out3)}</strong>`;
+  taxesLine4.innerHTML = `VAT (+14%) only: <strong>${formatEGPLoose(out4)}</strong>`;
 }
 
 // Live update on input
