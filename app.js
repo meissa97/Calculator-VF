@@ -1,45 +1,45 @@
 // --- Data ---
 const RED_TARIFF_PRICES = {
-  "Red Essential": 460,
-  "Essential+": 510,
-  "Red Advance": 760,
-  "Advance+": 860,
-  "Red Prime": 1060,
-  "Prime+": 1210,
-  "Red Elite": 1510,
-  "Elite+": 1760,
-  "Red Exclusive": 3010
+  "Red Essential": 530,
+  "Essential+": 585,
+  "Red Advance": 870,
+  "Advance+": 990,
+  "Red Prime": 1210,
+  "Prime+": 1390,
+  "Red Elite": 1735,
+  "Elite+": 2010,
+  "Red Exclusive": 3460
 };
 
 const DSL_TARIFFS = {
-  "30 * 140": 210,
-  "30 * 200": 290,
-  "30 * 300": 430,
-  "30 * 600": 850,
-  "70 * 300": 610,
-  "100 * 300": 780,
-  "100 * 600": 1230,
-  "200 * 1T": 1760
+  "30 * 150": 260,
+  "30 * 200": 330,
+  "30 * 300": 460,
+  "30 * 750": 925,
+  "70 * 300": 690,
+  "100 * 300": 880,
+  "100 * 750": 1425,
+  "200 * 1.5T": 2350
 };
 
 const AT_HOME_TARIFFS = {
-  "40 GB": 250,
-  "135 GB": 450,
-  "250 GB": 720,
-  "400 GB": 1100
+  "40 GB": 290,
+  "135 GB": 520,
+  "250 GB": 830,
+  "400 GB": 1270
 };
 
 // DSL discount tied to the selected Red tariff (by name)
 const DSL_DISCOUNT_BY_RED = {
-  "Red Essential": 210,
-  "Essential+": 210,
-  "Red Advance": 210,
-  "Advance+": 210,
-  "Red Prime": 290,
-  "Prime+": 290,
-  "Red Elite": 430,
-  "Elite+": 430,
-  "Red Exclusive": 850
+  "Red Essential": 260,
+  "Essential+": 260,
+  "Red Advance": 260,
+  "Advance+": 260,
+  "Red Prime": 330,
+  "Prime+": 330,
+  "Red Elite": 460,
+  "Elite+": 460,
+  "Red Exclusive": 925
 };
 
 // --- Helpers ---
@@ -55,10 +55,10 @@ const isEssentialAdvanceTier = (redName) =>
 // - If DSL ON   -> 450 ONLY for "Red Exclusive", otherwise 0
 function getAtHomeDiscount(redName, includeDSL) {
   if (!includeDSL) {
-    return isEssentialAdvanceTier(redName) ? 250 : 450;
+    return isEssentialAdvanceTier(redName) ? 290 : 520;
   }
   // DSL is ON
-  return redName === "Red Exclusive" ? 450 : 0;
+  return redName === "Red Exclusive" ? 520 : 0;
 }
 
 // Core calculation (Red + optional DSL + optional At home)
